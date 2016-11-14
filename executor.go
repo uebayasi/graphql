@@ -21,6 +21,8 @@ type ExecuteParams struct {
 	// Context may be provided to pass application-specific per-request
 	// information to resolve functions.
 	Context context.Context
+
+	UserContext interface{}
 }
 
 func Execute(p ExecuteParams) (result *Result) {
@@ -35,6 +37,7 @@ func Execute(p ExecuteParams) (result *Result) {
 		Errors:        nil,
 		Result:        result,
 		Context:       p.Context,
+		UserContext:   p.UserContext,
 	})
 
 	if err != nil {
@@ -69,6 +72,7 @@ type BuildExecutionCtxParams struct {
 	Errors        []gqlerrors.FormattedError
 	Result        *Result
 	Context       context.Context
+	UserContext   interface{}
 }
 type ExecutionContext struct {
 	Schema         Schema
@@ -78,6 +82,7 @@ type ExecutionContext struct {
 	VariableValues map[string]interface{}
 	Errors         []gqlerrors.FormattedError
 	Context        context.Context
+	UserContext    interface{}
 }
 
 func buildExecutionContext(p BuildExecutionCtxParams) (*ExecutionContext, error) {
@@ -124,6 +129,7 @@ func buildExecutionContext(p BuildExecutionCtxParams) (*ExecutionContext, error)
 	eCtx.VariableValues = variableValues
 	eCtx.Errors = p.Errors
 	eCtx.Context = p.Context
+	eCtx.UserContext = p.UserContext
 	return eCtx, nil
 }
 
@@ -542,6 +548,7 @@ func resolveField(eCtx *ExecutionContext, parentType *Object, source interface{}
 		Args:    args,
 		Info:    info,
 		Context: eCtx.Context,
+		UserContext: eCtx.UserContext,
 	})
 
 	if resolveFnError != nil {
@@ -654,6 +661,7 @@ func completeAbstractValue(eCtx *ExecutionContext, returnType Abstract, fieldAST
 		Value:   result,
 		Info:    info,
 		Context: eCtx.Context,
+		UserContext: eCtx.UserContext,
 	}
 	if unionReturnType, ok := returnType.(*Union); ok && unionReturnType.ResolveType != nil {
 		runtimeType = unionReturnType.ResolveType(resolveTypeParams)
@@ -691,6 +699,7 @@ func completeObjectValue(eCtx *ExecutionContext, returnType *Object, fieldASTs [
 			Value:   result,
 			Info:    info,
 			Context: eCtx.Context,
+			UserContext: eCtx.UserContext,
 		}
 		if !returnType.IsTypeOf(p) {
 			panic(gqlerrors.NewFormattedError(
@@ -778,6 +787,7 @@ func defaultResolveTypeFn(p ResolveTypeParams, abstractType Abstract) *Object {
 			Value:   p.Value,
 			Info:    p.Info,
 			Context: p.Context,
+			UserContext: p.UserContext,
 		}
 		if res := possibleType.IsTypeOf(isTypeOfParams); res {
 			return possibleType

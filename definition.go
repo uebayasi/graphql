@@ -382,6 +382,8 @@ type IsTypeOfParams struct {
 	// It is commonly
 	// used to represent an authenticated user, or request-specific caches.
 	Context context.Context
+
+	UserContext interface{}
 }
 
 type IsTypeOfFn func(p IsTypeOfParams) bool
@@ -589,6 +591,8 @@ type ResolveParams struct {
 	// It is commonly
 	// used to represent an authenticated user, or request-specific caches.
 	Context context.Context
+
+	UserContext interface{}
 }
 
 type FieldResolveFn func(p ResolveParams) (interface{}, error)
@@ -708,6 +712,8 @@ type ResolveTypeParams struct {
 	// It is commonly
 	// used to represent an authenticated user, or request-specific caches.
 	Context context.Context
+
+	UserContext interface{}
 }
 
 type ResolveTypeFn func(p ResolveTypeParams) *Object
